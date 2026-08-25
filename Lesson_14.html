@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ham Radio Station</title>
+    <style>
+        textarea { width: 100%; height: 100px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .control-group { display: flex; justify-content: flex-start; margin-bottom: 12px; align-items: center; }
+        label { font-weight: bold; font-size: 13px; color: #333; }
+        input[type="number"] { width: 90px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; font-size: 15px; font-weight: bold; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:disabled { background: #ccc; }
+        button.stop { background: #DC3545; }
+        button.pause { background: #FFC107; color: #212529; }
+        #log { margin-top: 15px; font-family: monospace; background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 40px; color: #555; }
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .header {
+            background-color: #1a365d;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+ 
+			justify-content: center;
+            align-items: center;
+            border-bottom: 4px solid #dd6b20;
+        }
+
+        .header h1 {
+
+            font-size: 3.6rem;
+          
+		
+        }
+
+
+
+        .post-card {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* Small Picture Thumbnail styling */
+        .post-thumb {
+            width: 150px;
+            min-width: 150px;
+            height: 100px;
+            overflow: hidden;
+            background-color: #ddd;
+        }
+
+        .post-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fits crop space cleanly */
+        }
+
+        /* Content inside post */
+        .post-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .post-category {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .post-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+		
+        .header .status {
+            background-color: #2f855a;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Main Layout Container */
+        .layout-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Left Sidebar Nav */
+        .sidebar {
+            width: 260px;
+            background-color: #2d3748;
+            color: #ffffff;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0aec0;
+            padding: 0 20px 10px 20px;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            color: #e2e8f0;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar ul li a:hover, 
+        .sidebar ul li a.active {
+            background-color: #4a5568;
+            color: #fffff0;
+            border-left: 4px solid #dd6b20;
+            padding-left: 16px;
+        }
+
+        /* Right Content Area */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background-color: #f4f6f9;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .card h3 {
+            color: #2b6cb0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        /* Data Grid Example */
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .log-table th, .log-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .log-table th {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1a365d;
+            color: #a0aec0;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.85rem;
+            margin-top: auto;
+            border-top: 1px solid #2d3748;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media (max-width: 768px) {
+            .layout-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+            .sidebar ul li a {
+                padding: 10px 15px;
+            }
+            .sidebar h2 {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Layout Component -->
+     <header class="header">
+	<a href="/" class="logo-link">
+      <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
+    </a>
+	<a href="/" class="logo-link">
+      <img src="logo.png" alt="Company Logo" class="logo-img">
+    </a>
+
+        <div>
+            <h1>Z3 HAM RADIO</h1>
+        </div>
+    <a href="/" class="logo-link">
+      <img src="logo.png" alt="Company Logo" class="logo-img">
+    </a>
+	<a href="/" class="logo-link">
+      <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
+    </a>
+    </header>
+
+
+    <!-- 2-Column Left Layout Component -->
+    <div class="layout-container">
+        
+        <!-- Left Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>Мени</h2>
+            <ul>
+                <li><a href="index.html">Насловна</a></li>
+                <li><a href="DXnews.html">DX Вести</a></li>
+                <li><a href="#">Contest Календар</a></li>
+                <li><a href="#">Електроника</a></li>
+                <li><a href="#">Занимливости</a></li>
+                <li><a href="#">МК POTA активности</a></li>
+				<li><a href="#">Дипломи</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Column -->
+        <main class="main-content">
+            
+            <section class="card">
+
+                <p>Z3 HAM RADIO</p>
+
+            </section>
+				<a href="Morse_code_lessons.html">
+				<img src="morse_code_main_small.jpg" class="top-right-img">
+				</a>
+            <h3>Четиринаесетта Лекција: СИТЕ БУКВИ</h3>
+			<p></p>
+
+
+            <p>Во четиринаесеттата лекција ќе ги повторите СИТЕ БУКВИ </p>
+			<p> Повторете ги на глас сите букви на ТИТ ТАА начинот- гласовно изговарање на буквите. Колку повеќе ги повторувате, толку полесно ги учите буквите. Практикувајте го овој начин на учење.</p>
+			<p>Вежбајте на овој начин со текстот даден подолу, при што не заборавајте да оставате пауза меѓу секои две букви.</p>
+			<img src="CODE1.jpg" alt="Company Logo" class="logo-img">
+
+
+            
+            <h3></h3>
+            <ul>
+        </main>
+    </div>
+		<script src="script.js"></script>
+		<label for="fname"> &emsp; Лекција 14: сите букви</label> 
+		<label for="fname">&emsp; 1000 Букви</label> 
+		<br></br>
+		<textarea id="textInput">= IJBZJ BSZSA UEIHH WAVZX AZUMZ XFLAN OLBMI XERNW RLRJX CURWZ HFAJP CLVWP SSKPE SGMUG NMLXE WAEXA CHWYF LTDJD WXGEW CVQMF WAZUM GDIIP PIATO XCZLV WWNRZ FHHXW OTGCH XLVRT FLHXU GFFFD KVKET SAMLF IAXKT ZCRXB ZZVTF UMDSD HBKSC IQPEJ KNXCT OMTJX BKRUE THOYJ QNUBH KLAAT BMKKR TRBHF GTGAC WIBDD CRUPD DGLVX GFLQT OCWIK OPTRW EXKXD DGASS KEEWX DTUPG XRQTG RQWFC AFACT YXZYX ZKDPN YJBJS TMSAN PPQQH YJVYV DGUAL WFXMT PTQLS SKYHA RZKYF YNFXK MFOBP EFIAO UXSCG KQOIJ QSHWM BFLLV ANUIG PBHOG TUFVT SYQNG CZCTL LVMTQ VWRPS COXMS RJAFZ COBYB XXXMA SJWHM SGDHL XQZWZ GWYSB QYIGB GYMCS KWGGP QKBLS BJOVK TTHSD ZHUKV VXWXP NLBYI FGWFD NZTRV SZPPP DTQWH JMNXF YKNDE SPTNG XIDDM LKNHP KRWST ZUVRB BKCPG HHXKY VYANF ZRJHU ZDCYP ITCGK UUQQQ INROD COSUZ GTUDP NCETD LTTLW RUQPD UIVAD XYZII PHLKC JANZW LNPCS FKIYJ VTORK DBXQD EYYTL YLFIY OSLMS LLPRF JJXRA EBZIZ DCXZA XISYS BKFTB THAOH MIUIW DGFSG SBWCH AOAGY UKYHP XOGES XZIFV XEGRI FQEUM RGVRF DPNQQ CWZYG LYXCU FYCBW WPUWG DGQEC NXXUQ AKJJW CAEIN NSHVC XYZBY CEZAU YUOVJ HTRYQ JHUNB ZWXFA EWYLJ PNZCE PRDHZ QBOCD ZGGTC IGKFY ZOAOY RSPFN WMESF BDUUA UPGXW WFISA AKTYC BWYZF UKSLZ TPEKR GXLQS RTHDR KUIKW IETPF ANJNC BIACL KNGDO TBEGJ KZPGA JFHXA AYYGK KMPRN HBXSM YKKCW</textarea>
+
+   <div class="control-group">
+        <label for="wpm">&emsp;Брзина (WPM, min 2):</label>
+        <input type="number" id="wpm" min="2" max="50" value="6">
+    </div>
+    
+    <div class="control-group">
+        <label for="freq">&emsp;Фреквенција (Hz):</label>
+        <input type="number" id="freq" min="100" max="2000" value="600">
+    </div>
+
+    <div class="control-group">
+        <label for="charDelayMul">&emsp;Карактер Delay Multiplier:</label>
+        <input type="number" id="charDelayMul" min="1" max="10" step="0.5" value="4.5">
+    </div>
+
+    <div class="control-group">
+        <label for="wordDelayMul">&emsp;Збор Delay Multiplier:</label>
+        <input type="number" id="wordDelayMul" min="1" max="10" step="0.5" value="1">
+    </div>
+
+    <div>
+        &emsp;<button id="playBtn" onclick="startMorse()">Старт</button>
+        <button id="pauseBtn" class="pause" onclick="togglePauseMorse()" disabled>Пауза</button>
+        <button id="stopBtn" class="stop" onclick="stopMorse()" disabled>Стоп</button>
+    </div>
+
+    <div id="log">Status: Idle</div>
+
+<script>
+    const morseMap = {
+        'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.',
+        'g': '--.', 'h': '....', 'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
+        'm': '--', 'n': '-.', 'o': '---', 'p': '.--.', 'q': '--.-', 'r': '.-.',
+        's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
+        'y': '-.--', 'z': '--..', '1': '.----', '2': '..---', '3': '...--',
+        '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..',
+        '9': '----.', '0': '-----', ' ': '/',  '=': '-...-'
+    };
+
+    let audioCtx = null;
+    let isPlaying = false;
+    let isPaused = false;
+    let timeoutId = null;
+    let activeOscillator = null;
+    let sequence = [];
+    let seqIndex = 0;
+
+    function getDotDuration(wpm) {
+        let safeWpm = Math.max(2, parseFloat(wpm) || 2);
+        return 1200 / safeWpm; // Standard PARIS timing rule: 1200 ms / WPM = dot duration
+    }
+
+    function stopMorse() {
+        isPlaying = false;
+        isPaused = false;
+        clearTimeout(timeoutId);
+        if (activeOscillator) {
+            try { activeOscillator.stop(); } catch(e) {}
+            activeOscillator = null;
+        }
+        if (audioCtx) {
+            audioCtx.close();
+            audioCtx = null;
+        }
+        document.getElementById('playBtn').disabled = false;
+        document.getElementById('pauseBtn').disabled = true;
+        document.getElementById('pauseBtn').innerText = 'Pause';
+        document.getElementById('stopBtn').disabled = true;
+        document.getElementById('log').innerText = 'Status: Stopped';
+        seqIndex = 0;
+    }
+
+    function togglePauseMorse() {
+        if (!isPlaying) return;
+        
+        if (!isPaused) {
+            isPaused = true;
+            clearTimeout(timeoutId);
+            if (activeOscillator) {
+                try { activeOscillator.stop(); } catch(e) {}
+                activeOscillator = null;
+            }
+            document.getElementById('pauseBtn').innerText = 'Resume';
+            document.getElementById('log').innerText = 'Status: Paused';
+        } else {
+            isPaused = false;
+            document.getElementById('pauseBtn').innerText = 'Pause';
+            processSequence();
+        }
+    }
+
+    async function startMorse() {
+        if (isPlaying) return;
+        
+        const text = document.getElementById('textInput').value.toLowerCase();
+        
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        isPlaying = true;
+        isPaused = false;
+        seqIndex = 0;
+
+        document.getElementById('playBtn').disabled = true;
+        document.getElementById('pauseBtn').disabled = false;
+        document.getElementById('pauseBtn').innerText = 'Pause';
+        document.getElementById('stopBtn').disabled = false;
+        
+        sequence = [];
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            if (char === '\n' || char === '\r') char = ' ';
+            let code = morseMap[char];
+            if (code) {
+                sequence.push({ type: 'char', val: code, original: char });
+            }
+        }
+
+        processSequence();
+    }
+
+    function playTone(duration, freq) {
+        return new Promise(resolve => {
+            if (!isPlaying || isPaused) return resolve();
+            activeOscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            activeOscillator.type = 'sine';
+            activeOscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.005);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + duration / 1000 - 0.005);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration / 1000);
+
+            activeOscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            activeOscillator.start();
+            activeOscillator.stop(audioCtx.currentTime + duration / 1000);
+            
+            timeoutId = setTimeout(() => {
+                activeOscillator = null;
+                resolve();
+            }, duration);
+        });
+    }
+
+    function wait(duration) {
+        return new Promise(resolve => {
+            if (!isPlaying || isPaused) return resolve();
+            timeoutId = setTimeout(resolve, duration);
+        });
+    }
+
+    async function processSequence() {
+        const wpm = Math.max(2, parseFloat(document.getElementById('wpm').value) || 2);
+        const freq = parseFloat(document.getElementById('freq').value) || 600;
+        const charMult = parseFloat(document.getElementById('charDelayMul').value) || 1;
+        const wordMult = parseFloat(document.getElementById('wordDelayMul').value) || 1;
+
+        const dotTime = getDotDuration(wpm);
+        const dashTime = dotTime * 3;
+        const intraCharPause = dotTime; 
+        const charPause = dotTime * 3 * charMult; 
+        const wordPause = dotTime * 7 * wordMult; 
+
+        while (seqIndex < sequence.length && isPlaying && !isPaused) {
+            let item = sequence[seqIndex];
+            
+            if (item.val === '/') {
+                document.getElementById('log').innerText = `Карактер: [Празно место]`;
+                await wait(wordPause);
+            } else {
+                document.getElementById('log').innerText = `Карактер: '${item.original.toUpperCase()}' (${item.val})`;
+                for (let j = 0; j < item.val.length; j++) {
+                    if (!isPlaying || isPaused) return;
+                    let symbol = item.val[j];
+                    let duration = (symbol === '.') ? dotTime : dashTime;
+                    
+                    await playTone(duration, freq);
+                    if (j < item.val.length - 1 && isPlaying && !isPaused) {
+                        await wait(intraCharPause);
+                    }
+                }
+                if (isPlaying && !isPaused) {
+                    await wait(charPause);
+                }
+            }
+            if (isPlaying && !isPaused) {
+                seqIndex++;
+            }
+        }
+        
+        if (isPlaying && !isPaused && seqIndex >= sequence.length) {
+            stopMorse();
+            document.getElementById('log').innerText = 'Статус: Крај на репродукција';
+        }
+    }
+</script>
+    <!-- Footer Component -->
+    <footer class="footer">
+        <p>&copy; 2026 Z3 Ham Radio. 73!</p>
+    </footer>
+
+</body>
+</html>

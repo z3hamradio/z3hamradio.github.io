@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Daily Feed | News</title>
+    <style>
+        /* --- CSS Reset & Variables --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary-color: #1a1a1a;
+            --accent-color: #d32f2f;
+            --text-muted: #666;
+            --bg-light: #f9f9f9;
+            --border-color: #e0e0e0;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+            line-height: 1.5;
+        }
+
+        /* --- Layout Container --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header Styles --- */
+        header {
+            text-align: center;
+            border-bottom: 4px double var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* --- Main Grid Layout --- */
+        .news-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* --- Small Picture Post Item (The Feed) --- */
+        .news-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post-card {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* Small Picture Thumbnail styling */
+        .post-thumb {
+            width: 150px;
+            min-width: 150px;
+            height: 100px;
+            overflow: hidden;
+            background-color: #ddd;
+        }
+
+        .post-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fits crop space cleanly */
+        }
+
+        /* Content inside post */
+        .post-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .post-category {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .post-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Sidebar Styles --- */
+        aside {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            height: fit-content;
+        }
+
+        aside h3 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .trending-list {
+            list-style: none;
+        }
+
+        .trending-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .trending-item a:hover {
+            color: var(--accent-color);
+        }
+
+        /* --- Responsive Breakpoints --- */
+        @media (max-width: 768px) {
+            .news-layout {
+                grid-template-columns: 1fr; /* Stacks feed and sidebar on tablet/mobile */
+            }
+            
+            .post-thumb {
+                width: 110px; /* Scales picture slightly smaller on tight viewports */
+                min-width: 110px;
+                height: 90px;
+            }
+            
+            .post-title {
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .post-card {
+                flex-direction: column; /* Stack image on top if screen is extremely narrow */
+            }
+            .post-thumb {
+                width: 100%;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Header Section -->
+        <header>
+            <h1>The Daily Feed</h1>
+            <p>Your Source for Reliable News & Current Affairs</p>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="news-layout">
+            
+            <!-- Left Side: News Feed with Small Pictures -->
+            <main class="news-feed">
+
+                <!-- Article 1 -->
+                <a href="#" class="post-card">
+                    <div class="post-thumb">
+                        <img src="https://unsplash.com" alt="Cyber security code">
+                    </div>
+                    <div class="post-content">
+                        <div>
+                            <div class="post-category">Technology</div>
+                            <h2 class="post-title">New AI Breakthrough Drastically Reduces Cloud Security Vulnerabilities</h2>
+                        </div>
+                        <div class="post-meta">2 hours ago &bull; By Sarah Jenkins</div>
+                    </div>
+                </a>
+
+                <!-- Article 2 -->
+                <a href="#" class="post-card">
+                    <div class="post-thumb">
+                        <img src="https://unsplash.com" alt="Stock market charts">
+                    </div>
+                    <div class="post-content">
+                        <div>
+                            <div class="post-category">Finance</div>
+                            <h2 class="post-title">Global Markets Experience Unprecedented Surge Amid New Trade Deals</h2>
+                        </div>
+                        <div class="post-meta">4 hours ago &bull; By David Vance</div>
+                    </div>
+                </a>
+
+                <!-- Article 3 -->
+                <a href="#" class="post-card">
+                    <div class="post-thumb">
+                        <img src="https://unsplash.com" alt="Person meditating outdoors">
+                    </div>
+                    <div class="post-content">
+                        <div>
+                            <div class="post-category">Lifestyle</div>
+                            <h2 class="post-title">How 10 Minutes of Daily Mindfulness Alters Stress Responses Over Time</h2>
+                        </div>
+                        <div class="post-meta">Yesterday &bull; By Elena Rossi</div>
+                    </div>
+                </a>
+
+                <!-- Article 4 -->
+                <a href="#" class="post-card">
+                    <div class="post-thumb">
+                        <img src="https://unsplash.com" alt="Runner at a starting block">
+                    </div>
+                    <div class="post-content">
+                        <div>
+                            <div class="post-category">Sports</div>
+                            <h2 class="post-title">Underdog Team Clinches Dramatic Victory in Championship Finals</h2>
+                        </div>
+                        <div class="post-meta">Yesterday &bull; By Marcus Cole</div>
+                    </div>
+                </a>
+
+            </main>
+
+            <!-- Right Side: Sidebar for Trending News -->
+            <aside>
+                <h3>Trending Topics</h3>
+                <ul class="trending-list">
+                    <li class="trending-item"><a href="#"># Renewable Energy Trends For Next Decade</a></li>
+                    <li class="trending-item"><a href="#"># Local Cities Adapting to Hybrid Workforce Shifts</a></li>
+                    <li class="trending-item"><a href="#"># Top Travel Destinations Facing Overtourism Bans</a></li>
+                    <li class="trending-item"><a href="#"># Understanding the Rise of Next-Gen Cryptocurrencies</a></li>
+                </ul>
+            </aside>
+
+        </div>
+    </div>
+
+</body>
+</html>

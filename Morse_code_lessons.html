@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ham Radio Station</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .header {
+            background-color: #1a365d;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+ 
+			justify-content: center;
+            align-items: center;
+            border-bottom: 4px solid #dd6b20;
+        }
+
+        .header h1 {
+
+            font-size: 3.6rem;
+          
+		
+        }
+
+
+
+        .post-card {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* Small Picture Thumbnail styling */
+        .post-thumb {
+            width: 150px;
+            min-width: 150px;
+            height: 100px;
+            overflow: hidden;
+            background-color: #ddd;
+        }
+
+        .post-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fits crop space cleanly */
+        }
+
+        /* Content inside post */
+        .post-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .post-category {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .post-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+		
+        .header .status {
+            background-color: #2f855a;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Main Layout Container */
+        .layout-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Left Sidebar Nav */
+        .sidebar {
+            width: 260px;
+            background-color: #2d3748;
+            color: #ffffff;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0aec0;
+            padding: 0 20px 10px 20px;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            color: #e2e8f0;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar ul li a:hover, 
+        .sidebar ul li a.active {
+            background-color: #4a5568;
+            color: #fffff0;
+            border-left: 4px solid #dd6b20;
+            padding-left: 16px;
+        }
+
+        /* Right Content Area */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background-color: #f4f6f9;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .card h3 {
+            color: #2b6cb0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        /* Data Grid Example */
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .log-table th, .log-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .log-table th {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1a365d;
+            color: #a0aec0;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.85rem;
+            margin-top: auto;
+            border-top: 1px solid #2d3748;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media (max-width: 768px) {
+            .layout-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+            .sidebar ul li a {
+                padding: 10px 15px;
+            }
+            .sidebar h2 {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Layout Component -->
+     <header class="header">
+	<a href="/" class="logo-link">
+      <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
+    </a>
+	<a href="/" class="logo-link">
+      <img src="logo.png" alt="Company Logo" class="logo-img">
+    </a>
+
+        <div>
+            <h1>Z3 HAM RADIO</h1>
+        </div>
+    <a href="/" class="logo-link">
+      <img src="logo.png" alt="Company Logo" class="logo-img">
+    </a>
+	<a href="/" class="logo-link">
+      <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
+    </a>
+    </header>
+
+
+    <!-- 2-Column Left Layout Component -->
+    <div class="layout-container">
+        
+        <!-- Left Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>Мени</h2>
+            <ul>
+                <li><a href="index.html">Насловна</a></li>
+                <li><a href="DXnews.html">DX Вести</a></li>
+                <li><a href="#">Contest Календар</a></li>
+                <li><a href="#">Електроника</a></li>
+                <li><a href="#">Занимливости</a></li>
+                <li><a href="#">МК POTA активности</a></li>
+				<li><a href="#">Дипломи</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Column -->
+        <main class="main-content">
+            
+            <section class="card">
+
+                <p>Z3 HAM RADIO</p>
+
+            </section>
+			<p>Морзеовата азбука е систем за пренос на пораки со помош на точки (.) и црти (-).</p>
+			<p>Секоја буква или број има свој уникатен ритам од кратки и долги сигнали.</p>
+				<p>Како работи?</p>
+				<p>•	Точка (.): Краток звучен сигнал - се чита "TИТ"</p>
+				<p>•	Црта (-): Долг звучен сигнал (три пати подолго од точката)  - се чита "TAA".</p>
+				<p>•	Празно место: Се користи за одвојување на буквите и зборовите.</p>
+				<p>Примери за букви  (Латиница)</p>
+				<p>•	А  ._ (точка, црта)</p>
+				<p>•	B  _... (црта, три точки)</p>
+				<p>•	W ._ _ (точка, две црти)</p>
+				<p>•	S ... (три точки)</p>
+				<p>•	О _ _ _ (три црти)</p>
+				<p> Еве една добра и интересна вежба. Пробајте да ги прочитате буквите дадени погоре, на глас со ТИТ и ТАА според комбинациите на точки и црти.</p>
+				<p> ПРИМЕР - буквата W, се состои од точка и две црти, што значи, на глас може да ја кажеме ТИТ ТАА ТАА. Пробајте со другите. Повторете неколку пати. Ова е добар начин за гласовно-звучно учење на буквите.</p>
+				<br>
+				<p> -- Понатаму во сите лекции буквите кои се изучуваат се со ГОЛЕМ фонт и LATINICA (латиница).</p>
+				<p> Плеерот е поставен на брзина доволна за изучување на буквите. Не е препорачливо менување на брзината. Но доколку сакате промени на поставувањата-брзината, може да ги направите во Settings на плеерот.</p>
+			
+				<p>Слика </p>
+				
+				<img src="Settings_player.JPG" alt="Company Logo" class="logo-img">
+				<br>
+				<h4>НАПОМЕНА- Во просторот "Status idle" при старт и емитување на карактерите, е даден кој карактер се емитува и неговиот морзеов код  - слика долу</h4>
+				<br>
+				<img src="character_read.jpg" alt="Company Logo" class="logo-img">
+				<p> Секоја лекција почнува со емитување на знакот = па потоа со текстот за вежбање. Помеѓу секоjа група од 5 карактери има подолга пауза.</p>
+				<p> После завршување со примање, текстот што го пишувавте рачно, може да го проверите со текстот во рамката до плеерот, односно да видите дали имате грешки при примањето.</p>
+				<p>!!! УЖИВАЈТЕ :) !!!</p>
+				<br></br>
+            <h3>Лекции за Морзеова азбука.</h3>
+			<h4>Букви</h4>
+            <a href="Lesson_1.html" target="_blank">1. Прва Лекција: A и N </a>
+			<br>
+            <a href="Lesson_2.html" target="_blank">2. Втора Лекција: E и T </a>
+			<br>
+            <a href="Lesson_3.html" target="_blank">3. Трета Лекција: I и M </a>
+			<br>
+            <a href="Lesson_4.html" target="_blank">4. Четврта Лекција: A N E T I и M - комбинација на 6 букви </a>			
+			<br>
+			<a href="Lesson_5.html" target="_blank">5. Петта Лекција: O и S </a>
+			<br>
+			<a href="Lesson_6.html" target="_blank">6. Шеста Лекција: U и D </a>
+			<br>
+			<a href="Lesson_7.html" target="_blank">7. Седма Лекција: A N E T I M S O U и D - комбинација на 10 букви </a>	
+			<br>
+			<a href="Lesson_8.html" target="_blank">8. Осма Лекција: R K W и G </a>	
+			<br>
+			<a href="Lesson_9.html" target="_blank">9. Деветта Лекција: L P B и F </a>	
+			<br>
+			<a href="Lesson_10.html" target="_blank">10. Десетта Лекција: R K W G L P B и F - комбинација на 8 букви  </a>	
+			<br>
+			<a href="Lesson_11.html" target="_blank">11. Единаесетта Лекција: Z J и Q  </a>	
+			<br>
+			<a href="Lesson_12.html" target="_blank">12. Дванаесетта Лекција: X и Y  </a>		
+			<br>
+			<a href="Lesson_13.html" target="_blank">13. Тринаесетта Лекција: C H и V </a>	
+			<br>
+			<a href="Lesson_14.html" target="_blank">14. Четиринаесетта Лекција: СИТЕ БУКВИ </a>	
+
+            <h4>Бројки</h4>
+			<a href="Lesson_15.html" target="_blank">15. Петнаесетта Лекција: Сите бројки 0 - 9 </a>
+	        <h4>Сите букви и бројки</h4>	
+			<a href="Lesson_16.html" target="_blank">16. Мешан текст на букви и бројки </a>
+	        <h4>Интерпукциски знаци</h4>	
+			<a href="Lesson_17.html" target="_blank">17. Интерпукциски знаци </a>
+		<br>
+		<br>
+		<h3>Дополнителни лекции</h3>
+		     <a href="Lesson_18.html" target="_blank">18. Интернационална Фоналфабетска листа </a>
+		
+            <ul>
+        </main>
+    </div>
+
+    <!-- Footer Component -->
+    <footer class="footer">
+        <p>&copy; 2026 Z3 Ham Radio. 73!</p>
+    </footer>
+
+</body>
+</html>

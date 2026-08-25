@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rufz Morse Trainer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .app-layout {
+            display: flex;
+            gap: 20px;
+            width: 640px;
+            height: 480px;
+        }
+        .history-panel {
+            background: #1e1e1e;
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .history-title {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #bb86fc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+        .history-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 13px;
+        }
+        .history-item {
+            padding: 6px 8px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            background: #252525;
+            display: flex;
+            justify-content: space-between;
+        }
+        .history-item.correct { border-left: 4px solid #03dac6; }
+        .history-item.wrong { border-left: 4px solid #cf6679; }
+        .history-wpm { color: #888; font-size: 11px; }
+
+        .container {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        h2 { margin-top: 0; color: #bb86fc; margin-bottom: 5px; }
+        
+        .controls-group {
+            background: #252525;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #b0bec5;
+        }
+        .control-row label { width: 90px; text-align: left; }
+        .control-row input[type="range"] { flex-grow: 1; margin: 0 10px; accent-color: #03dac6; }
+        .control-row span { width: 55px; text-align: right; font-weight: bold; color: #fff; }
+
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #252525;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        .score-box { display: flex; flex-direction: column; }
+        .score-label { font-size: 11px; color: #aaa; text-transform: uppercase; }
+        .score-val { font-size: 18px; font-weight: bold; color: #03dac6; }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            font-size: 18px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            text-align: center;
+            text-transform: uppercase;
+            align-self: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #03dac6;
+            border: none;
+            color: #000;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: center;
+            margin-top: 10px;
+        }
+        button:hover { background: #018786; color: #fff; }
+        .score { font-size: 14px; font-weight: bold; min-height: 20px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+    <div class="history-panel">
+        <div class="history-title">Session History</div>
+        <ul class="history-list" id="historyList"></ul>
+    </div>
+
+    <div class="container">
+        <h2>Rufz CW Trainer</h2>
+        
+        <div class="controls-group">
+            <div class="control-row">
+                <label for="wpmSlider">Speed:</label>
+                <input type="range" id="wpmSlider" min="5" max="60" value="12">
+                <span id="wpmDisplay">12 WPM</span>
+            </div>
+            <div class="control-row">
+                <label for="freqSlider">Pitch/Tone:</label>
+                <input type="range" id="freqSlider" min="400" max="1000" step="10" value="700">
+                <span id="freqDisplay">700 Hz</span>
+            </div>
+        </div>
+        
+        <div class="scoreboard">
+            <div class="score-box">
+                <span class="score-label">Score</span>
+                <span class="score-val" id="scoreVal">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">Streak</span>
+                <span class="score-val" id="streakVal">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">Accuracy</span>
+                <span class="score-val" id="accuracyVal">0%</span>
+            </div>
+        </div>
+
+        <input type="text" id="userInput" placeholder="Press Start..." autocomplete="off">
+        <button id="startBtn">Start Session</button>
+        <div class="score" id="resultMsg"></div>
+    </div>
+</div>
+
+<script>
+    const calls = ["W1AW", "DL1XYZ", "K9ABC", "JA1MQP", "G3XYZ", "OH2BH", "I2RGV", "VE3NE", "PA3FWM", "ZS6CC"];
+    let currentCall = "";
+    let audioCtx = null;
+    let isPlaying = false;
+    let currentToneTimeout = null;
+
+    let score = 0;
+    let streak = 0;
+    let totalAttempts = 0;
+    let correctAttempts = 0;
+
+    const morseMap = {
+        'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+        'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+        'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+        'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+        'Y': '-.--', 'Z': '--..', '1': '.----', '2': '..---', '3': '...--',
+        '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..',
+        '9': '----.', '0': '-----'
+    };
+
+    const inputField = document.getElementById('userInput');
+    const startBtn = document.getElementById('startBtn');
+    const resultMsg = document.getElementById('resultMsg');
+    
+    const scoreVal = document.getElementById('scoreVal');
+    const streakVal = document.getElementById('streakVal');
+    const accuracyVal = document.getElementById('accuracyVal');
+    const historyList = document.getElementById('historyList');
+
+    const wpmSlider = document.getElementById('wpmSlider');
+    const wpmDisplay = document.getElementById('wpmDisplay');
+    const freqSlider = document.getElementById('freqSlider');
+    const freqDisplay = document.getElementById('freqDisplay');
+
+    wpmSlider.addEventListener('input', () => {
+        wpmDisplay.textContent = `${wpmSlider.value} WPM`;
+    });
+    freqSlider.addEventListener('input', () => {
+        freqDisplay.textContent = `${freqSlider.value} Hz`;
+    });
+
+    function getDotDuration(wpmSpeed) {
+        return 1.2 / wpmSpeed; 
+    }
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playTone(duration) {
+        return new Promise((resolve) => {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.value = parseInt(freqSlider.value); 
+            
+            gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.5, audioCtx.currentTime + 0.005);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime + duration - 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+            
+            currentToneTimeout = setTimeout(resolve, duration * 1000);
+        });
+    }
+
+    function playPause(duration) {
+        return new Promise(resolve => {
+            currentToneTimeout = setTimeout(resolve, duration * 1000);
+        });
+    }
+
+    function stopCurrentAudio() {
+        clearTimeout(currentToneTimeout);
+        isPlaying = false;
+    }
+
+    async function playMorseString(str) {
+        isPlaying = true;
+        
+        for (let char of str.toUpperCase()) {
+            if (!isPlaying) break; 
+            const code = morseMap[char];
+            if (code) {
+                for (let symbol of code) {
+                    if (!isPlaying) break;
+                    
+                    const currentWpm = parseInt(wpmSlider.value);
+                    const dot = getDotDuration(currentWpm);
+                    const dash = dot * 3;
+                    const intraCharSpace = dot;
+
+                    if (symbol === '.') {
+                        await playTone(dot);
+                    } else if (symbol === '-') {
+                        await playTone(dash);
+                    }
+                    await playPause(intraCharSpace);
+                }
+                const currentWpm = parseInt(wpmSlider.value);
+                const dot = getDotDuration(currentWpm);
+                await playPause((dot * 3) - dot);
+            }
+        }
+        isPlaying = false;
+    }
+
+    function nextSequence() {
+        stopCurrentAudio();
+        inputField.value = "";
+        inputField.placeholder = "Type callsign...";
+        inputField.focus();
+
+        currentCall = calls[Math.floor(Math.random() * calls.length)];
+        
+        setTimeout(() => {
+            playMorseString(currentCall);
+        }, 400);
+    }
+
+    function updateScoreUI() {
+        scoreVal.textContent = score;
+        streakVal.textContent = streak;
+        const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+        accuracyVal.textContent = `${accuracy}%`;
+    }
+
+    function addHistoryItem(isCorrect, actualCall, typedCall, runWpm) {
+        const li = document.createElement('li');
+        li.className = `history-item ${isCorrect ? 'correct' : 'wrong'}`;
+        
+        const textSpan = document.createElement('span');
+        textSpan.textContent = isCorrect ? actualCall : `${actualCall} (${typedCall || 'Ø'})`;
+
+        const wpmSpan = document.createElement('span');
+        wpmSpan.className = 'history-wpm';
+        wpmSpan.textContent = `${runWpm} WPM`;
+
+        li.appendChild(textSpan);
+        li.appendChild(wpmSpan);
+        historyList.insertBefore(li, historyList.firstChild);
+    }
+
+    startBtn.addEventListener('click', () => {
+        wpmSlider.value = 12; 
+        wpmDisplay.textContent = "12 WPM";
+        
+        score = 0;
+        streak = 0;
+        totalAttempts = 0;
+        correctAttempts = 0;
+        
+        resultMsg.textContent = "";
+        historyList.innerHTML = ""; 
+        updateScoreUI();
+        nextSequence();
+    });
+
+    inputField.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const userText = inputField.value.trim().toUpperCase();
+            totalAttempts++;
+            const wasCorrect = (userText === currentCall);
+            const recordedWpm = parseInt(wpmSlider.value);
+
+            if (wasCorrect) {
+                correctAttempts++;
+                streak++;
+                score += (recordedWpm * 10); 
+                resultMsg.style.color = '#03dac6';
+                resultMsg.textContent = `Correct! (${currentCall})`;
+                wpmSlider.value = Math.min(60, recordedWpm + 2);
+            } else {
+                streak = 0;
+                resultMsg.style.color = '#cf6679';
+                resultMsg.textContent = `Wrong! It was ${currentCall}`;
+                wpmSlider.value = Math.max(12, recordedWpm - 2); 
+            }
+            
+            wpmDisplay.textContent = `${wpmSlider.value} WPM`;
+            addHistoryItem(wasCorrect, currentCall, userText, recordedWpm);
+            updateScoreUI();
+            nextSequence();
+        }
+    });
+</script>
+
+</body>
+</html>
