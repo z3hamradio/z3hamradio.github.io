@@ -41,6 +41,68 @@
 		
         }
 
+
+
+        .post-card {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* Small Picture Thumbnail styling */
+        .post-thumb {
+            width: 150px;
+            min-width: 150px;
+            height: 100px;
+            overflow: hidden;
+            background-color: #ddd;
+        }
+
+        .post-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fits crop space cleanly */
+        }
+
+        /* Content inside post */
+        .post-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .post-category {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .post-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+		
         .header .status {
             background-color: #2f855a;
             padding: 5px 12px;
@@ -115,14 +177,8 @@
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 8px;
         }
-        .top-right-img {
-			position: absolute; /* Moves the image freely */
-			top: 0;             /* Aligns to the very top */
-			right: 0;           /* Aligns to the far right */
-			width: 15%       /* Set your preferred image width */
-			height: auto;
-		}
-				/* Data Grid Example */
+
+        /* Data Grid Example */
         .log-table {
             width: 100%;
             border-collapse: collapse;
@@ -177,7 +233,7 @@
 <body>
 
     <!-- Top Layout Component -->
-    <header class="header">
+     <header class="header">
 	<a href="/" class="logo-link">
       <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
     </a>
@@ -195,6 +251,7 @@
       <img src="Side_image.JPG" alt="Company Logo" class="logo-img">
     </a>
     </header>
+
 
     <!-- 2-Column Left Layout Component -->
     <div class="layout-container">
@@ -217,18 +274,16 @@
         <main class="main-content">
             
             <section class="card">
-                <h3>Насловна</h3>
-           
-				<h2>Вести, информации, занимливости, активности ...</h2>
-			
-				
-                <img src="Naslovna_slika.JPG" alt="Ital">
-				<a href="Morse_code_lessons.html">
-				<img src="morse_code_main.JPG" class="top-right-img">
-				</a>
+
+                <h3>MK POTA</h3>
+                <p>Z3 HAM RADIO</p>
+
             </section>
 
-
+ 
+            
+            <h3></h3>
+            <ul>
         </main>
     </div>
 
